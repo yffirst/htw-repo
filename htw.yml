@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: htw-deck-system
+  namespace: default
+spec:
+  selector:
+    app: htw-deck-system
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: htw-deck-system
+spec:
+  selector:
+    matchLabels:
+      app: htw-deck-system
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: htw-deck-system
+    spec:
+      containers:
+      - name: htw-deck-system
+        image: registry.choerodon.dev.hithinksoft.com/hithinksoft-hithinkway/htw-deck-system:latest
+        ports:
+        - containerPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-http
+  namespace: default
+spec:
+  rules:
+    - host: htw-deck-system.hithinksoft.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: htw-deck-system
+                port:
+                  number: 80
