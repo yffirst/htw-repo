@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: keycloak
+  namespace: keycloak
+spec:
+  project: default
+  source:
+    chart: keycloak
+    repoURL: oci://registry-1.docker.io/bitnamicharts/keycloak
+    targetRevision: lasted
+    helm:
+      releaseName: keycloak
+      valuesObject:
+        ingress:
+          enabled: true
+          hostname: keycloak.k8s.hithinksoft.com
+        auth:
+          adminUser: admin
+          adminPassword: admin
+        postgresql:
+          auth:
+            password: admin
+        proxy: edge
+        hostname-strict: false
+  destination:
+    server: "https://kubernetes.default.svc"
+    namespace: keycloak
